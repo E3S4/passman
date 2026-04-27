@@ -169,6 +169,26 @@ void update_password(struct Password *passwords, int count, char *master_passwor
     printf("Website not found.\n");
 }
 
+//function to save passwords as encrypted in text form
+void save_passwords(struct Password *passwords, int count, char *master_password) {
+    FILE *file = fopen("passwords.txt", "w");
+
+    if (file == NULL) {
+        printf("Error saving passwords.\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        char decrypted[100];
+        decryption(passwords[i].password, decrypted, master_password);
+
+        fprintf(file, "%s|%s|%s\n", passwords[i].website, passwords[i].username, decrypted);
+    }
+
+    fclose(file);
+}
+    
+
 // search category (still basic)
 void search_by_category(struct Password *passwords, int count) {
     char category[20];
