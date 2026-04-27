@@ -27,28 +27,7 @@ void decryption(char *input, char *output, char *key) {
     encryption(input, output, key); // XOR decryption is the same as encryption
 }
 
-// ask the user to enter the master password and that remains permanent and stores in the .txt file
-void set_master_password(char *master_password) {
-   char e/s[10];
-   // if the user has already set a master password, then ask them to enter it again to confirm or else if he hasnt then ask him to set it for the first time
-   FILE *file = fopen("master_password.txt", "r");
-    if (file != NULL) {
-        fclose(file);
-        strcpy(e/s, "Enter");
-    } else {
-        strcpy(e/s, "Set");
-    }
-    // then it does it stuff here
-    printf("%s your master password: ", e/s);
-    scanf("%s", master_password);
-    FILE *file = fopen("master_password.txt", "w");
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        exit(1);
-    }
-    fprintf(file, "%s", master_password);
-    fclose(file);
-}
+
 // func to enter password and store it in the .txt file with encryption
 void add_password(struct Password *passwords, int *count, char *master_password) {
     struct Password new_password;
@@ -94,41 +73,163 @@ void display_passwords(struct Password *passwords, int count, char *master_passw
     }
 }
 
-int main(){
-// array to store passwords
+// add a function to search for a password by website name
+void search_password(struct Password *passwords, int count, char *master_password) {
+    char website[50];
+    printf("Enter website to search: ");
+    scanf("%s", website);
+    for (int i = 0; i < count; i++) {
+        if (strcmp(passwords[i].website, website) == 0) {
+            char decrypted_password[100];
+            decryption(passwords[i].password, decrypted_password, master_password);
+            printf("Website: %s, Username: %s, Password: %s\n",
+                     passwords[i].website, passwords[i].username, decrypted_password);
+            return;
+        }
+    }
+    printf("Password for website '%s' not found.\n", website);
+}
+
+// add a function not to echo master password when typing it 
+void get_master_password(char *master_password) {
+    printf("Enter your master password: ");
+    // disable echoing
+    system("stty -echo");
+    scanf("%s", master_password);
+    // enable echoing
+    system("stty echo");
+    printf("\n");
+}
+
+// add a function to add labels like Saving Password for Facebook as Social Media, Saving Password for Gmail as Email, etc and Wrong master password should not allow access to the stored passwords
+void add_label(struct Password *passwords, int count) {
+    char website[50];
+    printf("Enter website to add label: ");
+    scanf("%s", website);
+    for (int i = 0; i < count; i++) {
+        if (strcmp(passwords[i].website, website) == 0) {
+            char label[20];
+            printf("Enter label for this website (e.g., Social Media, Email, Banking):
+            scanf("%s", label);
+            printf("Label '%s' added to website '%s'.\n", label, website
+            );
+            return;
+        }
+    }
+    printf("Website '%s' not found.\n", website);
+}
+    // add a function to update/delete a stored password
+void update_password(struct Password *passwords, int count, char *master_password) {
+    char website[50];
+    printf("Enter website to update password: ");
+    scanf("%s", website);
+    for (int i = 0; i < count; i++) {
+        if (strcmp(passwords[i].website, website) == 0) {
+            char new_password[100];
+            printf("Enter new password: ");
+            scanf("%s", new_password);
+            char encrypted_password[100];
+            encryption(new_password, encrypted_password, master_password);
+            strcpy(passwords[i].password, encrypted_password);
+            printf("Password for website '%s' updated successfully.\n", website);
+            return;
+        }
+    }
+    printf("Website '%s' not found.\n", website);
+}
+    // add a function to search passwords by category
+void search_by_category(struct Password *passwords, int count) {
+    char category[20];
+    printf("Enter category to search (e.g., Social Media, Email, Banking): ");
+    scanf("%s", category);
+    printf("Passwords in category '%s':\n", category);
+    for (int i = 0; i < count; i++) {
+        if (strstr(passwords[i].website, category) != NULL) {
+            printf("Website: %s, Username: %s\n", passwords[i].website, passwords[i].username);
+        }
+    }
+}  
+// add a function to set master password as permanent and user cant change it and the encrypted passwords get deleted after 5 wrong attempts of entering the master password
+void set_permanent_master_password(char *master_password) {
+    FILE *file = fopen("master_password.txt", "r");
+
+    // 🔴 If already exists → don't allow overwrite
+    if (file != NULL) {
+        printf("Master password already set. You cannot change it.\n");
+        fclose(file);
+        return;
+    }
+
+    // 🟢 First time setup
+    printf("Set your master password: ");
+    scanf("%s", master_password);
+
+    file = fopen("master_password.txt", "w");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    fprintf(file, "%s", master_password);
+    fclose(file);
+
+    printf("Master password set successfully.\n");
+}
+
+int verify_master_password(char *master_password) {
+    FILE *file = fopen("master_password.txt", "r");
+
+    if (file == NULL) {
+        printf("No master password found. Please set it first.\n");
+        return 0;
+    }
+
+    char stored_password[50];
+    fscanf(file, "%s", stored_password);
+    fclose(file);
+
+    int attempts = 0;
+
+    while (attempts < 5) {
+        printf("Enter master password: ");
+        scanf("%s", master_password);
+
+        if (strcmp(master_password, stored_password) == 0) {
+            printf("Access granted.\n");
+            return 1;
+        } else {
+            attempts++;
+            printf("Wrong password! Attempts left: %d\n", 5 - attempts);
+        }
+    }
+
+    // 💀 After 5 failed attempts
+    printf("Too many failed attempts. Deleting all stored passwords...\n");
+    remove("passwords.txt");
+
+    return 0;
+}
+
+// initialise the program
+int main() {
     struct Password passwords[100];
     int count = 0;
     char master_password[50];
-  // setting up master password  
-    set_master_password(master_password);
-   // asking life choices :skull 
-    int choice;
-    do {
-        printf("1. Add password\n");
-        printf("2. Categorize passwords\n");
-        printf("3. Display passwords\n");
-        printf("4. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-        
-        switch (choice) {
-            case 1:
-                add_password(passwords, &count, master_password);
-                break;
-            case 2:
-                categorize_password(passwords, count);
-                break;
-            case 3:
-                display_passwords(passwords, count, master_password);
-                break;
-            case 4:
-                printf("Exiting...\n");
-                break;
-            default:
-                printf("Invalid choice! Please try again.\n");
-        }
-    } while (choice != 4);
-    
-    return 0;
 
+    set_permanent_master_password(master_password);
+
+    if (!verify_master_password(master_password)) {
+        return 1; // Exit if master password verification fails
+    }
+
+    // Example usage
+    add_password(passwords, &count, master_password);
+    categorize_password(passwords, count);
+    display_passwords(passwords, count, master_password);
+    search_password(passwords, count, master_password);
+    add_label(passwords, count);
+    update_password(passwords, count, master_password);
+    search_by_category(passwords, count);
+
+    return 0;
 }
