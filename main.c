@@ -356,7 +356,7 @@ int main() {
     while (1) {
 
 
-    system("clear"); // linux 
+    system("clear"); // linux you can use "cls" for windows
     draw_box_with_title();
 
     printf("Enter choice: ");
