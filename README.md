@@ -3,48 +3,64 @@
 ## goal :
 
 1. create a password manager that can store and retrieve passwords securely
-2. use a master password to encrypt and decrypt the stored passwords
-3. use a simple command line interface to interact with the program
-4. use a .txt file to store encrypted passwords
-5. apply a basic encryption algorithm for learning purposes
+2. use a master password to encrypt and decrypt stored data
+3. build a clean command line interface for interaction
+4. store data in a text file format
+5. implement a simple encryption method for learning
 
 ---
 
 ## overview :
 
-this project is a terminal-based password manager written in C
+this is a terminal-based password manager written in C
 
-it provides a simple system to store credentials (website, username, password), protect them using a master password, and retrieve them when needed
+the idea is simple: store credentials safely, lock them behind a master password, and only reveal them when needed
 
-the focus of this project is on understanding core programming concepts such as file handling, data structures, and basic encryption
+it’s not trying to be industry-level secure — it’s built to understand how systems like this actually work under the hood
+
+---
+
+## architecture :
+
+the program is structured into clear parts:
+
+* `struct Password`
+  stores website, username, and encrypted password
+
+* encryption logic
+  handles converting plain text into encrypted form and back
+
+* file system
+  saves and loads data from text files
+
+* CLI layer
+  handles all user interaction through a menu
 
 ---
 
 ## features :
 
-* master password authentication
-* encryption and decryption using a simple XOR-based method
-* persistent storage using file handling
+* master password setup and verification
+* XOR-based encryption and decryption
+* file-based storage (persistent data)
 * add new credentials
 * search credentials by website
 * display all stored credentials
-* masked input for sensitive fields
-* structured menu-driven interface
-* attempt limit for authentication
+* masked input for passwords
+* menu-driven interface
+* limited login attempts
 
 ---
 
-## file structure :
+## data format :
 
-* `passwords.txt`
-  stores encrypted credentials in the format:
+stored in `passwords.txt` like this:
 
-  ```
-  website|username|encrypted_password
-  ```
+```id="fmt01"
+website|username|encrypted_password
+```
 
-* `master_password.txt`
-  stores the master password
+simple, readable, and easy to parse
 
 ---
 
@@ -52,63 +68,72 @@ the focus of this project is on understanding core programming concepts such as 
 
 compile :
 
-```bash id="build01"
+```bash id="cmd01"
 gcc main.c -o manager
 ```
 
 run :
 
-```bash id="run01"
+```bash id="cmd02"
 ./manager
 ```
 
 ---
 
-## program flow :
+## flow :
 
-1. on first execution, the user sets a master password
-2. on subsequent runs, the user must verify the master password
-3. once authenticated, the main menu is displayed
-4. the user can choose to:
+1. first run → set a master password
+2. next runs → verify it
+3. after login → menu shows up
+4. choose what you want to do:
 
-   * add a new password
-   * search for an existing password
-   * display all stored passwords
-   * exit the program (data is saved before exit)
+   * add password
+   * search password
+   * display all
+   * exit (auto saves)
+
+---
+
+## design choices :
+
+* fixed-size arrays → simple and predictable
+* text files → easy to debug and inspect
+* XOR encryption → lightweight and good for learning
+* modular functions → cleaner code structure
 
 ---
 
 ## limitations :
 
-* the encryption method is not secure for real-world usage
-* the master password is stored in plain text
-* input handling is basic and may not support spaces
-* storage is limited to 100 entries
-* no delete or advanced editing functionality
+* encryption is basic (not secure for real-world use)
+* master password is stored in plain text
+* input does not support spaces
+* no delete or edit functionality yet
+* max 100 stored entries
 
 ---
 
 ## future improvements :
 
-* implement stronger encryption (e.g., AES)
-* hash the master password instead of storing it directly
-* support safer input handling (e.g., fgets)
-* add delete and update operations
-* improve terminal UI and layout
-* add password generator and strength checker
-* encrypt the entire file instead of individual fields
+* stronger encryption (AES or similar)
+* hash the master password
+* better input handling (fgets)
+* add delete and update features
+* improve UI/UX in terminal
+* password generator + strength checker
+* encrypt full file instead of fields
 
 ---
 
-## learning outcomes :
+## learning focus :
 
-this project helps in understanding:
+this project helps you understand:
 
-* structures and memory usage in C
-* file handling (read/write operations)
-* basic encryption logic
-* input/output handling in CLI applications
-* modular program design
+* how data is structured and stored
+* how file handling works in C
+* how basic encryption works
+* how CLI tools are designed
+* how to break code into clean modules
 
 ---
 
