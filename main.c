@@ -318,6 +318,24 @@ int verify_master_password(char *master_password) {
 
     return 0;
 }
+//  draw box with title
+void draw_box_with_title() {
+
+    printf("|");
+    for (int i = 0; i < 70; i++) printf("_");
+    printf("\n");
+
+    printf("|%-70s|\n", "   PASSWORD MANAGER");
+
+    for (int i = 0; i < 4; i++) {
+        printf("|%-70s|\n", " ");
+    }
+
+    printf("|");
+    for (int i = 0; i < 70; i++) printf("_");
+    printf("|\n");
+}
+
 // main
 int main() {
 
@@ -336,6 +354,13 @@ int main() {
     char choice;
 
     while (1) {
+
+
+    system("clear"); // linux 
+    draw_box_with_title();
+
+    printf("Enter choice: ");
+    scanf(" %c", &choice);
 
         printf("\nSelect The Correct Choice:\n");
         printf("1. Add Password\n");
