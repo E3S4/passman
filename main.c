@@ -18,11 +18,16 @@ struct Password {
 // encryption
 void encryption(char *input, char *output, char *key) {
     int key_len = strlen(key);
-    if (key_len == 0) return; // safety
+
+    if (key_len == 0) {
+        strcpy(output, input); // safer fallback
+        return;
+    }
 
     for (int i = 0; input[i] != '\0'; i++) {
         output[i] = input[i] ^ key[i % key_len];
     }
+
     output[strlen(input)] = '\0';
 }
 
@@ -50,7 +55,6 @@ void add_password(struct Password *passwords, int *count, char *master_password)
     printf("Enter password: ");
     scanf("%99s", new_password.password);
 
-    // encrypt before storing
     char encrypted_password[100];
     encryption(new_password.password, encrypted_password, master_password);
 
@@ -60,40 +64,6 @@ void add_password(struct Password *passwords, int *count, char *master_password)
     (*count)++;
 
     printf("Password added successfully.\n");
-}
-
-// categorize
-void categorize_password(struct Password *passwords, int count) {
-
-    printf("Categorizing passwords...\n");
-
-    for (int i = 0; i < count; i++) {
-
-        if (strstr(passwords[i].website, "facebook") ||
-            strstr(passwords[i].website, "twitter") ||
-            strstr(passwords[i].website, "instagram")) {
-
-            printf("Social Media: %s\n", passwords[i].website);
-
-        }
-
-        else if (strstr(passwords[i].website, "gmail") ||
-                 strstr(passwords[i].website, "yahoo") ||
-                 strstr(passwords[i].website, "outlook")) {
-
-            printf("Email: %s\n", passwords[i].website);
-        }
-
-        else if (strstr(passwords[i].website, "bank") ||
-                 strstr(passwords[i].website, "paypal")) {
-
-            printf("Banking: %s\n", passwords[i].website);
-        }
-
-        else {
-            printf("Other: %s\n", passwords[i].website);
-        }
-    }
 }
 
 // display
@@ -144,69 +114,14 @@ void get_master_password(char *master_password) {
 
     printf("Enter your master password: ");
 
-    system("stty -echo");   // hide input (linux)
+    system("stty -echo");
     scanf("%49s", master_password);
     system("stty echo");
 
     printf("\n");
 }
 
-// label (still simple, not stored)
-void add_label(struct Password *passwords, int count) {
-
-    char website[50];
-
-    printf("Enter website to add label: ");
-    scanf("%49s", website);
-
-    for (int i = 0; i < count; i++) {
-
-        if (strcmp(passwords[i].website, website) == 0) {
-
-            char label[20];
-
-            printf("Enter label (Social/Email/Banking): ");
-            scanf("%19s", label);
-
-            printf("Label '%s' added to '%s'\n", label, website);
-            return;
-        }
-    }
-
-    printf("Website not found.\n");
-}
-
-// update
-void update_password(struct Password *passwords, int count, char *master_password) {
-
-    char website[50];
-
-    printf("Enter website to update: ");
-    scanf("%49s", website);
-
-    for (int i = 0; i < count; i++) {
-
-        if (strcmp(passwords[i].website, website) == 0) {
-
-            char new_pass[100];
-
-            printf("Enter new password: ");
-            scanf("%99s", new_pass);
-
-            char encrypted[100];
-            encryption(new_pass, encrypted, master_password);
-
-            strcpy(passwords[i].password, encrypted);
-
-            printf("Updated successfully.\n");
-            return;
-        }
-    }
-
-    printf("Website not found.\n");
-}
-
-// save passwords (FIXED -> saves encrypted now)
+// save passwords
 void save_passwords(struct Password *passwords, int count) {
 
     FILE *file = fopen("passwords.txt", "w");
@@ -221,7 +136,7 @@ void save_passwords(struct Password *passwords, int count) {
         fprintf(file, "%s|%s|%s\n",
                 passwords[i].website,
                 passwords[i].username,
-                passwords[i].password); // encrypted
+                passwords[i].password);
     }
 
     fclose(file);
@@ -234,7 +149,8 @@ void load_passwords(struct Password *passwords, int *count) {
 
     if (file == NULL) return;
 
-    while (fscanf(file, "%49[^|]|%49[^|]|%99[^\n]\n",
+    while (*count < 100 &&
+           fscanf(file, "%49[^|]|%49[^|]|%99[^\n]\n",
                   passwords[*count].website,
                   passwords[*count].username,
                   passwords[*count].password) == 3) {
@@ -243,24 +159,6 @@ void load_passwords(struct Password *passwords, int *count) {
     }
 
     fclose(file);
-}
-
-// search category (basic)
-void search_by_category(struct Password *passwords, int count) {
-
-    char category[20];
-
-    printf("Enter keyword to search: ");
-    scanf("%19s", category);
-
-    for (int i = 0; i < count; i++) {
-
-        if (strstr(passwords[i].website, category)) {
-            printf("%s | %s\n",
-                   passwords[i].website,
-                   passwords[i].username);
-        }
-    }
 }
 
 // set master password
@@ -318,8 +216,9 @@ int verify_master_password(char *master_password) {
 
     return 0;
 }
-//  draw box with title
-void draw_box_with_title() {
+
+// draw menu box
+void draw_menu_box() {
 
     printf("|");
     for (int i = 0; i < 70; i++) printf("_");
@@ -327,13 +226,23 @@ void draw_box_with_title() {
 
     printf("|%-70s|\n", "   PASSWORD MANAGER");
 
-    for (int i = 0; i < 4; i++) {
-        printf("|%-70s|\n", " ");
-    }
+    printf("|%-70s|\n", " ");
+    printf("|%-70s|\n", "   1. Add Password");
+    printf("|%-70s|\n", "   2. Search Password");
+    printf("|%-70s|\n", "   3. Display All");
+    printf("|%-70s|\n", "   4. Exit");
+    printf("|%-70s|\n", " ");
 
     printf("|");
     for (int i = 0; i < 70; i++) printf("_");
     printf("|\n");
+}
+
+// pause
+void pause_screen() {
+    printf("\nPress Enter to continue...");
+    getchar();
+    getchar();
 }
 
 // main
@@ -355,33 +264,27 @@ int main() {
 
     while (1) {
 
+        system("clear");
+        draw_menu_box();
 
-    system("clear"); // linux you can use "cls" for windows
-    draw_box_with_title();
-
-    printf("Enter choice: ");
-    scanf(" %c", &choice);
-
-        printf("\nSelect The Correct Choice:\n");
-        printf("1. Add Password\n");
-        printf("2. Search Passwords\n");
-        printf("3. Display All\n");
-        printf("4. Exit\n");
-
+        printf("Enter choice: ");
         scanf(" %c", &choice);
 
         switch (choice) {
 
             case '1':
                 add_password(passwords, &count, master_password);
+                pause_screen();
                 break;
 
             case '2':
                 search_password(passwords, count, master_password);
+                pause_screen();
                 break;
 
             case '3':
                 display_passwords(passwords, count, master_password);
+                pause_screen();
                 break;
 
             case '4':
@@ -391,6 +294,7 @@ int main() {
 
             default:
                 printf("Invalid choice.\n");
+                pause_screen();
         }
     }
 }
