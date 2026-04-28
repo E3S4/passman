@@ -1,5 +1,4 @@
-# passman
-#  Password Manager (C - CLI)
+# Password Manager (C - CLI)
 
 ## goal :
 
@@ -11,50 +10,45 @@
 
 ---
 
-##  overview :
+## overview :
 
-this is a simple command line based password manager written in C
+this is a command line based password manager written in C
 
-it lets you:
+it allows you to store, search, and display passwords while keeping them encrypted using a master password
 
-* store passwords
-* encrypt them using a master password
-* search and display them
-* save/load from a file
-
-everything runs in terminal with a clean menu UI
+the program uses file handling to save and load data and provides a structured menu interface in the terminal
 
 ---
 
-##  features :
+## features :
 
-*  master password protection
-*  encryption + decryption (XOR based)
-*  save + load passwords from file
-*  search passwords by website
-*  display all stored passwords
-*  masked password input (no plain typing visible)
-*  clean CLI menu with box UI
-*  attempt limit (data deleted after too many wrong tries)
+* master password protection
+* encryption and decryption (XOR based)
+* save and load passwords from file
+* search passwords by website
+* display all stored passwords
+* masked password input
+* structured CLI menu interface
+* limited login attempts with data reset
 
 ---
 
 ## files used :
 
-* `passwords.txt` → stores encrypted passwords
-* `master_password.txt` → stores master password
+* passwords.txt → stores encrypted passwords
+* master_password.txt → stores master password
 
 ---
 
-##  how to run :
+## how to run :
 
-### compile :
+compile :
 
 ```bash
 gcc main.c -o manager
 ```
 
-### run :
+run :
 
 ```bash
 ./manager
@@ -62,55 +56,51 @@ gcc main.c -o manager
 
 ---
 
-##  how it works :
+## how it works :
 
-1. first time → you set a master password
-2. next runs → you must verify it
-3. after login → menu appears
-4. choose options:
+1. on first run, user sets a master password
+2. on next runs, user must verify the master password
+3. after successful login, menu is displayed
+4. user can:
 
    * add password
    * search password
-   * display all
-   * exit (auto saves)
+   * display all passwords
+   * exit (data is saved automatically)
 
 ---
 
-##  limitations :
+## limitations :
 
-* encryption is basic (XOR) → not secure for real-world use
+* encryption method is basic and not secure for real-world use
 * master password is stored in plain text
-* no delete/edit UI yet
-* uses fixed size storage (100 entries max)
+* no delete or edit functionality
+* fixed storage limit (100 entries)
 
 ---
 
-##  future improvements :
+## future improvements :
 
-* stronger encryption (AES)
-* hash master password instead of storing directly
-* add delete + update features
-* better UI (colors / animations)
-* password generator
-* file encryption instead of plain text
+* implement stronger encryption
+* hash the master password
+* add delete and update features
+* improve user interface
+* add password generator
+* encrypt entire file instead of storing plain text
 
 ---
 
-##  note :
+## note :
 
-this project is made for learning purpose
-focus is on understanding:
+this project is built for learning purposes and focuses on:
 
 * file handling
-* structs
-* encryption basics
-* CLI design
+* structures in C
+* basic encryption concepts
+* command line interface design
 
 ---
 
-##  author :
+## author :
 
-made by Eesa
-grade 9 dev on the grind 
-
----
+Eesa
