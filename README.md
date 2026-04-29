@@ -1,4 +1,4 @@
-# Password Manager (C - CLI)
+# Passman (C - CLI)
 
 ## goal :
 
@@ -69,13 +69,13 @@ simple, readable, and easy to parse
 compile :
 
 ```bash id="cmd01"
-gcc main.c -o manager
+gcc main.c -o passman
 ```
 
 run :
 
 ```bash id="cmd02"
-./manager
+./passman
 ```
 
 ---
